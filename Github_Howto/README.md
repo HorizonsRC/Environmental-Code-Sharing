@@ -1,7 +1,7 @@
 # Github New user setup
 
 - These resources will help you learn github
-    - GIT? https://guides.github.com/introduction/git-handbook/
+    - GIT https://guides.github.com/introduction/git-handbook/
     - The Git workflow: https://guides.github.com/introduction/flow/
     - Github issues: https://guides.github.com/features/issues/
     - Markdown: https://guides.github.com/features/mastering-markdown/
