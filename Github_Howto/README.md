@@ -25,10 +25,7 @@ Checklist Questions to stimulate thought about a Project's Reproducibility: http
 
 - Grolemund & Wickham (2017) R for Data Science
 - J. Adler (2010): R in a Nutshell
-- U. Ligges (2008): Programmieren mit R (German)
 - M. Crawley (2007): The R-book
 - H. Wickham (2014) Advanced R
 - H. Wickham (2015) R Packages
-- domain specific: Chapman and Hall R Series
-- Many more listed at github.com/RomanTsegelskyi/rbooks
-- Review list at ecotope.org, through the wayback machine
+
