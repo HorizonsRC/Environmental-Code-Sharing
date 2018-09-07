@@ -1,0 +1,48 @@
+Script Header Guideline
+
+#####################################################################################
+#
+#  Function Name:   <- name of function as called in script   
+#
+#  Description:     <- detailed description of what the function does 
+#
+#  Arguments:       <- list of arguments the function accepts and their restrictions
+#
+#  Outputs:         <- list the outputs produced by this function
+#
+#  Notes:           <- include any user notes, user warnings and dependencies needed to run   
+#                     the code
+#
+#  Example:         <- provide an example of how to use this function
+#
+#  Created by:      <- your name
+#  Created on:      <- date
+#
+#  Last updated:    <- date
+#  Last updated by: <- name
+#
+####################################################################################
+
+R Function detail
+For use in a package. More info on formatting : https://cran.r-project.org/web/packages/roxygen2/vignettes/formatting.html
+
+#' @title
+#'
+#' @description
+#'   Date: 
+#'
+#' @param
+#' @param
+#'
+#' @return
+#'
+#' @details
+#' @note contents
+#'
+#' @author
+#'
+#' @seealso
+#'
+#' @export
+#'
+#' @examples
