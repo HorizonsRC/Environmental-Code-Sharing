@@ -1,0 +1,531 @@
+---
+title: "R Basics"
+author: "Madison Frank"
+date: "October 2018"
+output:
+  html_document:
+    df_print: paged
+    code_folding: show
+    theme: lumen
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Getting Started 
+
+**This document provides a very brief overview to basic progamming in R adapted from training provided by Prof. Ross Ihaka.** 
+
+Further information can be found at https://www.stat.auckland.ac.nz/~ihaka/?Teaching
+
+*Topics include:* 
+
+* Setting Up
+* R 101: The Basics
+* Creating Plots
+* Writing Functions
+* R and Hilltop  
+* Report Writing
+
+## Set up 
+
+To start we need to download R, as of Oct 2018 the latest version is 3.5.1 (Feather Spray). I also highly recommend downloading RStudio - an integrated development environment (IDE) for R.
+
+  <div align="center">[R](https://www.r-project.org/)  |  [RStudio](https://www.rstudio.com/)</div>
+  
+
+# Starting to Code
+## Basic calculations 
+One way to think of R is as a very powerful calculator. If we type a calculation into the console an answer is printed out.
+
+```{r} 
+# Performing calculations using mathematical notation
+2 + 2
+
+# Precedence can be set using parentheses
+(10 + 5) / 2
+```
+
+Once R has completed the computation the answer is discarded. To 'save' a result you can assign a name using <- or = to create a _variable_. Variables can then be used in subsequent expressions.
+
+```{r}
+# Create a variable by assigning a name 'a'
+a <- 5^2
+```
+Notice no result is printed
+
+```{r}
+# Print the result named 'a'
+a
+
+# Calculate the square root of 'a'
+sqrt(a)
+```
+
+## Vectors 
+R operates on named data structures - the most basic of which is a vector. Vectors contain an indexed collection of values of the *same type*.
+
+Vectors are usually created with the function c()
+```{r}
+x <- c(1, 3, 5, 7, 9)
+y <- c(TRUE, FALSE, TRUE)
+```
+
+Check the type of a variable 
+```{r}
+class(x)
+class(y)
+```
+
+Determine the number of elements in a vector
+```{r}
+length(x)
+length(y)
+```
+
+```{r}
+# Be careful of mixing types
+c(1, 5.5, 7)
+
+c(1, TRUE, "Hello")
+
+```
+
+## Number sequences 
+Creating vectors by a sequence
+```{r}
+5:10
+seq(1, 10, by = 2)
+-12.5:12
+```
+
+## Vector arithmetic 
+```{r}
+x
+x + 10
+sqrt(x)
+1:10/2
+```
+
+## Subsetting vectors 
+Values can be subset out a vector using square brackets [ ]
+
+```{r}
+x
+
+x[3]
+
+x[2:4]
+
+x[-3]
+```
+
+## Conditional subsetting 
+
+```{r}
+x > 5
+x[x > 5]
+```
+
+## Named vectors 
+```{r}
+names(x) <- c("Jan", "Mar", "May", "Jul", "Sep")
+x
+
+x["May"]
+```
+
+## Summarizing data 
+```{r}
+c(mean = mean(x), sd = sd(x))
+quantile(x)
+cumsum(x)
+```
+
+**Tip:** To get information about a function try **?_function name_**
+
+## Dataframes 
+Dataframes are one of the ways R presents tabular data. 
+
+A dataframe is comprised of columns and rows, both of which can be named, of the same length. Each column holds the same type of data.
+
+```{r}
+rain <- read.csv("Data/MIL_DailyRainfall.csv")
+rain$Date <- as.Date(rain$Date)
+
+# Display the start or end of a dataframe with head() and tail()
+head(rain)
+```
+
+## Subsetting dataframes 
+Dataframes can be subset using [row, column]
+```{r}
+rain[1, 1]
+
+rain[1,]
+
+head(rain[,1])
+```
+
+## Building a PCAL dataframe 
+
+```{r}  
+# Create a month column for calculating statistics
+rain$Month <- factor(format(rain$Date, "%b"), levels = month.abb)
+
+head(rain)
+```
+
+Note that you can call a column by name with $
+
+```{r}
+# # Calculate monthly total rainfall
+# rainTotal <- tapply(rain$Rainfall, rain$Month, sum)
+# 
+# # Create a dataframe with month and total rainfall
+# df <- data.frame(Month = month.abb,
+#                  Total = rainTotal)
+# 
+# head(df)
+```
+
+### Add min, mean and max to the dataframe
+```{r}
+# Add min, mean and max to the dataframe
+pcal <- cbind(df, 
+              Min = tapply(rain$Rainfall, rain$Month, min), 
+              Mean = tapply(rain$Rainfall, rain$Month, mean), 
+              Max = tapply(rain$Rainfall, rain$Month, max))
+
+# Drop the rownames
+row.names(pcal) <- 1:12
+
+
+head(pcal)
+```
+
+### Rounding numbers to make the table more user friendly
+```{r}
+# Add min, mean and max to the dataframe
+pcal <- cbind(df, 
+              Min = tapply(rain$Rainfall, rain$Month, min), 
+              ### <b>
+              Mean = round(tapply(rain$Rainfall, rain$Month, mean), 2), 
+              ### </b>
+              Max = tapply(rain$Rainfall, rain$Month, max))
+
+# Drop the rownames
+row.names(pcal) <- 1:12
+
+
+head(pcal)
+```
+
+# Making plots 
+## Base R plotting 
+R has built in plotting capabilities - to view more details about possible graphical parameters try ?plot
+
+```{r}
+x <- data.frame(Month = 1:12, 
+                Flow = c(25.4, 38.6, 27.3, 56.5, 53.4, 48.7, 
+                         59.1, 62.1, 60.1, 69.8, 25.3, 13.5))
+```
+
+## A basic plot 
+
+```{r}
+plot(x)
+```
+
+## Improving the plot 
+
+```{r}
+plot(x, main = "Manawatu at Teachers College", pch = 16, col = 1:12, type = "b",
+     xlab = "2017", ylab = "Avg Monthly Flow (cumecs)")
+```
+
+## Adding more information to our plot
+
+```{r}
+# Choosing colours for the points based on flow values
+cols <- vector(length = 12)
+cols[x$Flow < 30] <- "red"
+cols[x$Flow > 60] <- "blue"
+cols[x$Flow >= 30 & x$Flow <= 60] <- "black"
+```
+
+----_
+
+```{r plot1, eval = FALSE}
+plot(x, main = "Manawatu at Teachers College Monthly Flow", xaxt = "n",
+     xlab = "2017", ylab = "Avg Monthly Flow (cumecs)")
+rect(6, 0, 9, 72, col = "lightgrey")
+text(7.5, 45, "Winter")
+lines(x$Month, x$Flow)
+points(x, pch = 16, col = cols)
+abline(h = 30, lty = 2)
+abline(h = 60, lty = 2)
+text(c(0, 20), "Low flows")
+text(c(0, 65), "High flows")
+axis(1, x$Month, month.abb)
+```
+
+----
+
+```{r plot1, echo=FALSE, eval=TRUE}
+```
+
+## Add a legend
+
+```{r legendPlot}
+par(oma=c(0, 0, 0, 5))
+
+plot(x, main = "Manawatu at Teachers College Monthly Flow", xaxt = "n",
+     xlab = "2017", ylab = "Avg Monthly Flow (cumecs)")
+rect(6, 0, 9, 72, col = "lightgrey")
+text(7.5, 45, "Winter")
+lines(x$Month, x$Flow)
+points(x, pch = 16, col = cols)
+abline(h = 30, lty = 2)
+abline(h = 60, lty = 2)
+text(c(0, 20), "Low flows")
+text(c(0, 65), "High flows")
+axis(1, x$Month, month.abb)
+
+legend(x = par('usr')[2], y = par('usr')[4], bty='n', xpd=NA, pch = 16, col = unique(cols),
+       legend = c("Low flow", "Moderate flow", "High flow"))
+```
+
+----
+
+```{r legendPlot, echo=FALSE, eval=TRUE}
+```
+
+## Other libraries for plotting
+There are a multitude of different packages for plotting. Some of the most popular include:
+
+* ggplot2 
+* htmlwidgets
+  
+  ----
+
+### ggplot2
+
+ggplot2 is part of the tidyverse package collection. Very basically it works by mapping the aesthetics of a dataset and then adding layers, scales, facets, etc... to build up a plot. 
+  If you would like to learn more about tidyverse coding I highly recommend [R for data science](https://r4ds.had.co.nz/index.html) by Hadley Wickham.
+  
+```{r ggplot}
+library(ggplot2)
+
+ggplot(data = mpg) + 
+geom_point(mapping = aes(x = displ, y = hwy, color = class))
+```
+
+  htmlwidgets are a collection of packages which provide an R interface to JavaScript libraries to create interactive visualisations. There are over 50 widgets available including dedicated options for mapping and timeseries. 
+  To see what widgets exist visit [**htmlwidgets** for R](https://www.htmlwidgets.org/index.html)
+
+----
+
+### htmlwidgets
+
+```{r plotly, message=FALSE}
+library(plotly)
+plot_ly(data = iris, x = ~Sepal.Length, y = ~Petal.Length, color = ~Species, type = "scatter")
+```
+
+----
+
+```{r dygraph}
+library(dygraphs)
+dygraph(nhtemp, main = "New Haven Temperatures") %>% 
+  dyRangeSelector(dateWindow = c("1920-01-01", "1960-01-01"))
+```
+
+----
+
+```{r leaflet}
+library(leaflet)
+leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=174.768, lat=-36.852, popup="The birthplace of R")
+```
+
+# Functions in R
+## Built in functions 
+Functions in R are denoted as: _function name_( )
+
+Function parameters or arguments are separated by a comma and may be named.  
+
+We have used a number of functions already such as; 
+```{r}
+x <- c(1:5)
+
+length(x)
+
+plot(x, main = "A Plot", col = x, pch = 16)
+```
+
+**Tip:** To view a function's arguments try typing in _function name_() and hit tab while the cursor is _inside_ the parentheses.
+
+## Vectorization 
+Vectorization is a fundamental principle in R. It refers to the ability to perform operations on a vector as a whole rather than element by element.
+
+For example we can perform vector arithmetic;
+```{r}
+x <- c(1, 2, 3)
+y <- c(10, 20, 30)
+x+y
+```
+
+Or we can pass a vector to a function and receive a result for each element;
+```{r}
+sqrt(x)
+```
+
+## Recycling 
+The recycling rule is how R handles vector operations on vectors of _different_ length. When the operation requires that both vectors be the same length R will automatically recycle the values of the shorter vector until both vectors are the same length.
+
+For example;
+```{r}
+x + 10
+x[c(TRUE, FALSE)]
+```
+
+## A Calculator Curiosity
+This example is taken from the book _Professor Stewart's Hoard of Mathematical Treasures_ by Ian Stewart. The solution code was provided by Prof. Ross Ihaka.
+
+(8 x 8) + 13
+
+(8 x 88) + 13
+
+(8 x 888) + 13
+
+(8 x 8888) + 13
+
+(8 x 88888) + 13
+
+(8 x 888888) + 13
+
+(8 x 8888888) + 13
+
+(8 x 88888888) + 13
+
+## A Calculator Curiosity: A vectorised solution 
+The sequences of 8 can be decomposed into 8, 8 + 80, 8 + 80 + 800, ect...
+
+Those values are the cummulative sum of the sequence 8, 80, 800, etc...
+
+That sequence is equivalent to 8x10^0, 8x10^1, 8x10^2, etc...
+
+So our code is as follows;
+```{r}
+n = 8
+cumsum(8 * 10^(1:n - 1))
+8 * cumsum(8 * 10^(1:n - 1)) + 13
+```
+
+## Control flow 
+There are several control constructs available in R, most commonly; 
+
+```{r, eval=FALSE}
+if(condition){
+  expression
+}
+```
+
+```{r, eval=FALSE}
+if(condition){
+  expression_1
+}else{
+  expression_2
+}
+```
+
+```{r, eval=FALSE}  
+for(variable in vector){
+  expression
+}
+```
+
+## A Calculator Curiosity: A control flow solution 
+How can we solve the calculator curiosity problem using control flow?
+
+The most logical method for solving our problem is using a for loop.
+
+
+Again building up the 8, 88, 888... is key. 
+
+We can do this by multiplying the previous value by 10 and adding 8.
+
+## A Calculator Curiosity: A control flow solution 
+
+```{r}
+numSeq = 8
+
+for (i in 1:8) {
+  print(8 * numSeq + 13)
+  
+  numSeq <- 10 * numSeq + 8
+}
+```
+
+## Writing your own functions 
+At some point you may want to start writing your own functions. 
+
+This can easily be acomplished in R using the structure
+
+```{r, eval=FALSE}
+functionName <- function(arg_1, arg_2 = defaultValue){
+
+                         Expressions to do something
+
+                         return(results)
+                }
+```
+
+You can then call your function with the default value
+
+_functionName_(x)
+
+or if you would like to overwrite the default value
+
+_functionName_(x, arg_2 = y)
+
+## A Calculator Curiosity: A function 
+Now that we can calculate the problem, how can we make a function to output _any_ number of answers?
+
+Our vectorised version is already a simple expression using 1 input:
+```{r}
+curiosity_1 <- function(n) 8 * cumsum(8 * 10^(1:n - 1)) + 13
+```
+
+```{r}
+curiosity_1(5)
+```
+
+## A Calculator Curiosity: A function 
+
+Our control flow solution is a bit more complicated. We need some way to store the results instead of just printing them out.
+
+```{r}
+curiosity_2 <- function(n){
+  ans <- numeric(n)
+  numSeq = 8
+
+  for (i in 1:n) {
+    ans[i] <- 8 * numSeq + 13
+    
+    numSeq <- 10 * numSeq + 8
+  }
+  return(ans)
+}
+```
+
+```{r}
+curiosity_2(3)
+```
+
+
